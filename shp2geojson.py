@@ -26,4 +26,5 @@ for shapeFile in sourceList:
     fileNameList = shapeFile.split('.')
     jsonFileName = outputDir+fileNameList[0]+".geoJSON"
     print "jsonFileName: " , jsonFileName
-    convertString = "ogr2ogr -f geoJSON jsonFileName newName"
+    convertString = "ogr2ogr -f geoJSON %s %s"% (jsonFileName, newName)
+    os.system(convertString)
