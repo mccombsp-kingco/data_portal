@@ -2,17 +2,18 @@ import os, subprocess, time
 
 
 def pythonFileList(sourceDir):
-    # identify a source directory of shapefiles
-
-    # test for expected projection print a warning if not expected state plane
-
-    # make a list of shape files
-    sourceList = ["agrpddst.shp",]
-
-
-    for (dirpath, dirnames, filenames) in walk(mypath):
-        f.extend(filenames)
-        break
+    # make a list of shape files in provided directory
+    fileList = os.listdir(sourceDir)
+    shapeList = []
+    for f in fileList:
+        print "filename ", f
+        parts = f.split('.')
+        print "second part ", parts[1]
+        if parts[1].lower() == 'shp' and len(parts) == 2:
+            print "Found One!!"
+            shapeList.append(f)
+    return shapeList
+   
 
 sourceDir = "/Users/paulmccombs/kccode/KC_Data/natres_SHP/natres/"
 
