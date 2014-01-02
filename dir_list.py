@@ -6,15 +6,15 @@ def pythonFileList(sourceDir):
     fileList = os.listdir(sourceDir)
     shapeList = []
     for f in fileList:
-        print "filename ", f
+        #print "filename ", f
         parts = f.split('.')
-        print "second part ", parts[1]
+        #print "second part ", parts[1]
         if parts[1].lower() == 'shp' and len(parts) == 2:
-            print "Found One!!"
+            #print "Found One!!"
             shapeList.append(f)
     return shapeList
    
-
-sourceDir = "/Users/paulmccombs/kccode/KC_Data/natres_SHP/natres/"
-
-print pythonFileList(sourceDir)
+if __name__ == "__main__":
+    sourceDir = "g:\AV_DEV_Deadman_Walking\SHAPFILS\CAO\poly"
+    import pprint
+    pprint.pprint(pythonFileList(sourceDir))
