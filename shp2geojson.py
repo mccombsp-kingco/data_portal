@@ -43,15 +43,26 @@ def push_to_github(outputDir, jsonFileName): #Note I probably broke this when I 
     # Use suprocess module to push revised data to github.
     # Need to set both the --git-dir and --work-tree
     # http://stackoverflow.com/questions/1386291/git-git-dir-not-working-as-expected
-    subprocess.call(['git','--git-dir', outputDir + '/.git',
-                     '--work-tree', outputDir,
+    subprocess.call(['git','--git-dir', './.git',
+                     '--work-tree', './.git',
                      'add', jsonFileName])
-    subprocess.call(['git', '--git-dir', outputDir + '/.git',
-                     '--work-tree', outputDir,
+    subprocess.call(['git', '--git-dir', './.git',
+                     '--work-tree', './.git',
                      'commit', '-m', '"Data Upload: ' + time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime()) + '"'])
-    subprocess.call(['git', '--git-dir', outputDir + '/.git',
-                     '--work-tree', outputDir,'push'])
-                 
+    subprocess.call(['git', '--git-dir', './.git', '--work-tree', './.git', 'push'])
+
+    # # Use suprocess module to push revised data to github.
+    # # Need to set both the --git-dir and --work-tree
+    # # http://stackoverflow.com/questions/1386291/git-git-dir-not-working-as-expected
+    # subprocess.call(['git','--git-dir', outputDir + '/.git',
+                     # '--work-tree', outputDir,
+                     # 'add', jsonFileName])
+    # subprocess.call(['git', '--git-dir', outputDir + '/.git',
+                     # '--work-tree', outputDir,
+                     # 'commit', '-m', '"Data Upload: ' + time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime()) + '"'])
+    # subprocess.call(['git', '--git-dir', outputDir + '/.git',
+    #                '--work-tree', outputDir,'push'])
+                     
 if __name__ == '__main__':
     try:
         for arg in sys.argv:
@@ -63,7 +74,7 @@ if __name__ == '__main__':
                     shp2geojson(sys.argv[1], sys.argv[2])
             if len(sys.argv) > 3:
                 print "Will put geoJSON files in %s"% sys.argv[2]
-                if sys.arv[3].lower() == "github":
+                if sys.argv[3].lower() == "github":
                     print "Will attempt to post geoJSON files to github"
                     shp2geojson(sys.argv[1], sys.argv[2], "github")
 
@@ -71,3 +82,5 @@ if __name__ == '__main__':
 
     except:
         print __doc__
+        raise
+        
