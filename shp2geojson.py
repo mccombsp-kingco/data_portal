@@ -9,14 +9,10 @@ import sys, os, subprocess, time, dir_list
 
 def shp2geojson(sourceDir, outputDir, github=0):
     """This is the main function of the script. It gets a list of shape files converts them to geoJSON and optionally posts them to github"""
-    # test for expected projection print a warning if not expected state plane.
-    # to be implemented later
+    # INSERT a test for expected projection print a warning if not expected state plane.
 
     # make a list of shape files
     sourceList = dir_list.shpFileList(sourceDir)
-
-    # identify an output directory
-    #outputDir = "./" # current directory
 
     # run the through the list of shape files
     for shapeFile in sourceList:
@@ -42,14 +38,20 @@ def shp2geojson(sourceDir, outputDir, github=0):
 def push_to_github(fulljsonFilePath, jsonFileName):
     """Used to post geoJSON files up to github. This requires a functional git hub environment on your computer."""
     # Use suprocess module to push revised data to github.
-    # Need to set both the --git-dir and --work-tree
-    # http://stackoverflow.com/questions/1386291/git-git-dir-not-working-as-expected
+    # This will choke horribly if geoJSON is over 100MB and you're trying to load to a free github account. Don't know if that changes with paid
+    # account.
+    # INSERT test for 100MB limit being exceeded.
+    # CHANGE using code sample in commments below to make this run from a directory other than a functional git hub repository. Will require adding
+    # a git repository directory as an agrument.
     os.system("copy %s .\\"% fulljsonFilePath)
     subprocess.call(['git', 'add', jsonFileName])
     subprocess.call(['git', 'commit', '-m', '"Data Upload: ' + time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime()) + '"'])
     subprocess.call(['git', 'push'])
     #os.system("del %s"% jsonFileName)
 
+    # This was the code sample from stack overflow that Peter Keum found. It was working but only when everything was in the same directory.
+    # It wasn't working for me and I messed arrond with it, I finaly decided to copy my files into the current working directory. Ended up
+    # stripping out a lot of the complications as they weren't relevant in that context. But keeping here for future repairs.
     # # Use suprocess module to push revised data to github.
     # # Need to set both the --git-dir and --work-tree
     # # http://stackoverflow.com/questions/1386291/git-git-dir-not-working-as-expected
