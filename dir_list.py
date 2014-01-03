@@ -1,7 +1,7 @@
 import os, subprocess, time
 
 
-def pythonFileList(sourceDir):
+def shpFileList(sourceDir):
     # make a list of shape files in provided directory
     fileList = os.listdir(sourceDir)
     shapeList = []
@@ -17,4 +17,4 @@ def pythonFileList(sourceDir):
 if __name__ == "__main__":
     sourceDir = "g:\AV_DEV_Deadman_Walking\SHAPFILS\CAO\poly"
     import pprint
-    pprint.pprint(pythonFileList(sourceDir))
+    pprint.pprint(shpFileList(sourceDir))
