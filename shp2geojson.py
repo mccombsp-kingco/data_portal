@@ -31,25 +31,24 @@ def shp2geojson(sourceDir, outputDir, github=0):
         os.system(reprojectString) 
         # convert to geoJSON
         fileNameList = shapeFile.split('.')
-        jsonFileName = outputDir+fileNameList[0]+".geoJSON"
-        print "jsonFileName: " , jsonFileName
-        convertString = "ogr2ogr -f geoJSON %s %s"% (jsonFileName, newName)
+        jsonFileName = fileNameList[0]+".geoJSON"
+        fulljsonFilePath = outputDir+jsonFileName
+        print "output geoJSON path: " , fulljsonFilePath
+        convertString = "ogr2ogr -f geoJSON %s %s"% (fulljsonFilePath, newName)
         os.system(convertString)
-    if github:
-        push_to_github(outputDir, jsonFileName)
+        if github:
+            push_to_github(fulljsonFilePath, jsonFileName)
         
-def push_to_github(outputDir, jsonFileName): #Note I probably broke this when I modularized the script. Not sure if it will work with the directories as is -pm
+def push_to_github(fulljsonFilePath, jsonFileName):
     """Used to post geoJSON files up to github. This requires a functional git hub environment on your computer."""
     # Use suprocess module to push revised data to github.
     # Need to set both the --git-dir and --work-tree
     # http://stackoverflow.com/questions/1386291/git-git-dir-not-working-as-expected
-    subprocess.call(['git','--git-dir', './.git',
-                     '--work-tree', './.git',
-                     'add', jsonFileName])
-    subprocess.call(['git', '--git-dir', './.git',
-                     '--work-tree', './.git',
-                     'commit', '-m', '"Data Upload: ' + time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime()) + '"'])
-    subprocess.call(['git', '--git-dir', './.git', '--work-tree', './.git', 'push'])
+    os.system("copy %s .\\"% fulljsonFilePath)
+    subprocess.call(['git', 'add', jsonFileName])
+    subprocess.call(['git', 'commit', '-m', '"Data Upload: ' + time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime()) + '"'])
+    subprocess.call(['git', 'push'])
+    #os.system("del %s"% jsonFileName)
 
     # # Use suprocess module to push revised data to github.
     # # Need to set both the --git-dir and --work-tree
