@@ -36,6 +36,7 @@ def shp2geojson(sourceDir, outputDir, github=0):
         convertString = "ogr2ogr -f geoJSON %s %s"% (jsonFileName, newName)
         os.system(convertString)
     if github:
+        push_to_github(outputDir, jsonFileName)
         
 def push_to_github(outputDir, jsonFileName): #Note I probably broke this when I modularized the script. Not sure if it will work with the directories as is -pm
     """Used to post geoJSON files up to github. This requires a functional git hub environment on your computer."""
@@ -53,18 +54,20 @@ def push_to_github(outputDir, jsonFileName): #Note I probably broke this when I 
                  
 if __name__ == '__main__':
     try:
+        for arg in sys.argv:
+            print "Argument: %s"% arg
         if len(sys.argv) > 1:
             print "Looking for shape files in %s"% sys.argv[1]
-            if len(sys.argv) >= 3:
+            if len (sys.argv) == 3:
+                    print "Will not attempt to post geoJSON files to github"
+                    shp2geojson(sys.argv[1], sys.argv[2])
+            if len(sys.argv) > 3:
                 print "Will put geoJSON files in %s"% sys.argv[2]
                 if sys.arv[3].lower() == "github":
                     print "Will attempt to post geoJSON files to github"
                     shp2geojson(sys.argv[1], sys.argv[2], "github")
-                else:
-                    print "Will not attempt to post geoJSON files to github"
-                    shp2geojson(sys.argv[1], sys.argv[2])
-                
-                
+
+        else: print __doc__
 
     except:
         print __doc__
