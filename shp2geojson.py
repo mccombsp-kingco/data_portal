@@ -1,5 +1,6 @@
 """
 python shp2geojson.py <input directory path> <output directory path> {push to github?: github}
+github argument requires being run from a functional git repository environment.
 """
 
 import sys, os, subprocess, time, dir_list
@@ -9,14 +10,15 @@ import sys, os, subprocess, time, dir_list
 
 def shp2geojson(sourceDir, outputDir, github=0):
     """This is the main function of the script. It gets a list of shape files converts them to geoJSON and optionally posts them to github"""
-    # INSERT a test for expected projection print a warning if not expected state plane.
-
     # make a list of shape files
+    # INSERT a test to verify this is a directory and ends with a slash of some kind.
     sourceList = dir_list.shpFileList(sourceDir)
 
     # run the through the list of shape files
     for shapeFile in sourceList:
+
         # reproject
+        # INSERT a test for expected projection print a warning if not expected state plane.
         newName = "%sproj_%s"% (outputDir,shapeFile)
         print "sourceDir: ", sourceDir
         print "shapeFile: ", shapeFile
@@ -25,6 +27,7 @@ def shp2geojson(sourceDir, outputDir, github=0):
         reprojectString = "ogr2ogr -t_srs EPSG:4326 %s %s"% (newName, oldName)
         print reprojectString
         os.system(reprojectString) 
+
         # convert to geoJSON
         fileNameList = shapeFile.split('.')
         jsonFileName = fileNameList[0]+".geoJSON"
@@ -43,11 +46,14 @@ def push_to_github(fulljsonFilePath, jsonFileName):
     # INSERT test for 100MB limit being exceeded.
     # CHANGE using code sample in commments below to make this run from a directory other than a functional git hub repository. Will require adding
     # a git repository directory as an agrument.
-    os.system("copy %s .\\"% fulljsonFilePath)
+    # Note: changed from copy to cp and del to rm so it would run on OSX.
+    # TEST in git bash to see if rm and cp are functional.
+    # CONSIDER: testing for os environment and using commands as appropriate.
+    os.system("cp %s .\\"% fulljsonFilePath)
     subprocess.call(['git', 'add', jsonFileName])
     subprocess.call(['git', 'commit', '-m', '"Data Upload: ' + time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime()) + '"'])
     subprocess.call(['git', 'push'])
-    #os.system("del %s"% jsonFileName)
+    os.system("rm %s"% jsonFileName)
 
     # This was the code sample from stack overflow that Peter Keum found. It was working but only when everything was in the same directory.
     # It wasn't working for me and I messed arrond with it, I finaly decided to copy my files into the current working directory. Ended up
