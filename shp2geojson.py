@@ -53,7 +53,7 @@ def push_to_github(fulljsonFilePath, jsonFileName):
     subprocess.call(['git', 'add', jsonFileName])
     subprocess.call(['git', 'commit', '-m', '"Data Upload: ' + time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime()) + '"'])
     subprocess.call(['git', 'push'])
-    os.system("rm %s"% jsonFileName)
+    # this causes problems sychronizing with github: os.system("rm %s"% jsonFileName)
 
     # This was the code sample from stack overflow that Peter Keum found. It was working but only when everything was in the same directory.
     # It wasn't working for me and I messed arrond with it, I finaly decided to copy my files into the current working directory. Ended up
