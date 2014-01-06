@@ -7,12 +7,21 @@ import sys, os, subprocess, time, dir_list
 
 # identify a source directory of shapefiles
 #sourceDir = "/Users/paulmccombs/kccode/KC_Data/natres_SHP/natres/"
-
+def fixDirname(dirName):
+	if dirName[-1] <> os.sep:
+	    dirName = dirName + os.sep
+	return dirName
+    
 def shp2geojson(sourceDir, outputDir, github=0):
-    """This is the main function of the script. It gets a list of shape files converts them to geoJSON and optionally posts them to github"""
+    """This is the main function of the script. It gets a list of shape files 
+    converts them to geoJSON and optionally posts them to github"""
     # make a list of shape files
     # INSERT a test to verify this is a directory and ends with a slash of some kind.
+    sourceDir = fixDirname(sourceDir)
+    outputDir = fixDirname(outputDir)
+
     sourceList = dir_list.shpFileList(sourceDir)
+
 
     # run the through the list of shape files
     for shapeFile in sourceList:
