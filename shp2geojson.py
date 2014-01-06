@@ -16,7 +16,6 @@ def shp2geojson(sourceDir, outputDir, github=0):
     """This is the main function of the script. It gets a list of shape files 
     converts them to geoJSON and optionally posts them to github"""
     # make a list of shape files
-    # INSERT a test to verify this is a directory and ends with a slash of some kind.
     sourceDir = fixDirname(sourceDir)
     outputDir = fixDirname(outputDir)
 
