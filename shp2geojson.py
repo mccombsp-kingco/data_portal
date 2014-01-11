@@ -57,10 +57,14 @@ def push_to_github(fulljsonFilePath, jsonFileName):
     # Note: changed from copy to cp and del to rm so it would run on OSX.
     # TEST in git bash to see if rm and cp are functional.
     # CONSIDER: testing for os environment and using commands as appropriate.
-    os.system("cp %s .\\"% fulljsonFilePath)
-    subprocess.call(['git', 'add', jsonFileName])
-    subprocess.call(['git', 'commit', '-m', '"Data Upload: ' + time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime()) + '"'])
-    subprocess.call(['git', 'push'])
+    jsonInfo = os.stat(fulljsonFilePath)
+    if jsonInfo.st_size > 2000000: #100000000:
+        print "%s is larger than 100MB and will not be loaded to github due to size restrictions."% fulljsonFilePath
+    else:
+        os.system("cp %s .\\"% fulljsonFilePath)
+        subprocess.call(['git', 'add', jsonFileName])
+        subprocess.call(['git', 'commit', '-m', '"Data Upload: ' + time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime()) + '"'])
+        subprocess.call(['git', 'push'])
     # this causes problems sychronizing with github: os.system("rm %s"% jsonFileName)
 
     # This was the code sample from stack overflow that Peter Keum found. It was working but only when everything was in the same directory.
