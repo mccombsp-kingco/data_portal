@@ -49,23 +49,26 @@ def shp2geojson(sourceDir, outputDir, github=0):
 def push_to_github(fulljsonFilePath, jsonFileName):
     """Used to post geoJSON files up to github. This requires a functional git hub environment on your computer."""
     # Use suprocess module to push revised data to github.
-    # This will choke horribly if geoJSON is over 100MB and you're trying to load to a free github account. Don't know if that changes with paid
-    # account.
     # INSERT test for 100MB limit being exceeded.
     # CHANGE using code sample in commments below to make this run from a directory other than a functional git hub repository. Will require adding
     # a git repository directory as an agrument.
     # Note: changed from copy to cp and del to rm so it would run on OSX.
     # TEST in git bash to see if rm and cp are functional.
     # CONSIDER: testing for os environment and using commands as appropriate.
+
+    # This will choke horribly if geoJSON is over 100MB and you're trying to load to a free github account. Don't know if that changes with paid
+    # account. Testing to prevent that outcome.
     jsonInfo = os.stat(fulljsonFilePath)
-    if jsonInfo.st_size > 2000000: #100000000:
+    if jsonInfo.st_size > 100000000:
         print "%s is larger than 100MB and will not be loaded to github due to size restrictions."% fulljsonFilePath
+    
+    # git push happens here
     else:
         os.system("cp %s .\\"% fulljsonFilePath)
         subprocess.call(['git', 'add', jsonFileName])
         subprocess.call(['git', 'commit', '-m', '"Data Upload: ' + time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime()) + '"'])
         subprocess.call(['git', 'push'])
-    # this causes problems sychronizing with github: os.system("rm %s"% jsonFileName)
+    #Cleaning up after posting caused problems sychronizing with github: os.system("rm %s"% jsonFileName)
 
     # This was the code sample from stack overflow that Peter Keum found. It was working but only when everything was in the same directory.
     # It wasn't working for me and I messed arrond with it, I finaly decided to copy my files into the current working directory. Ended up
