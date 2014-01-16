@@ -38,7 +38,7 @@ def shp2geojson(sourceDir, outputDir, github=0):
 
         # convert to geoJSON
         fileNameList = shapeFile.split('.')
-        jsonFileName = fileNameList[0]+".geoJSON"
+        jsonFileName = fileNameList[0]+".geojson"
         fulljsonFilePath = outputDir+jsonFileName
         print "output geoJSON path: " , fulljsonFilePath
         convertString = "ogr2ogr -f geoJSON %s %s"% (fulljsonFilePath, newName)
