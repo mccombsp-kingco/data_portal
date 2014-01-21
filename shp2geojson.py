@@ -3,7 +3,7 @@ python shp2geojson.py <input directory path> <output directory path> {push to gi
 github argument requires being run from a functional git repository environment.
 """
 
-import sys, os, subprocess, time, dir_list
+import sys, os, subprocess, time, dir_list, getOGRinfo
 
 # identify a source directory of shapefiles
 #sourceDir = "/Users/paulmccombs/kccode/KC_Data/natres_SHP/natres/"
@@ -26,7 +26,13 @@ def shp2geojson(sourceDir, outputDir, github=0):
     for shapeFile in sourceList:
 
         # reproject
+        
+        #########
         # INSERT a test for expected projection print a warning if not expected state plane.
+        # look for results of eg. ogrinfo -so intrmpaa.shp intrmpaa
+        print getOGRinfo.getInfo()
+        #########
+
         newName = "%sproj_%s"% (outputDir,shapeFile)
         print "sourceDir: ", sourceDir
         print "shapeFile: ", shapeFile
