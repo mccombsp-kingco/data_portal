@@ -1,11 +1,31 @@
+import subprocess
+
 #########
 # INSERT a test for expected projection print a warning if not expected state plane.
 # look for results of eg. ogrinfo -so intrmpaa.shp intrmpaa
 #
-# p = subprocess.Popen('ogrinfo -so sfw_baldeaglebuf.shp sfw_baldeaglebuf', stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-# output = p.communicate()
-# for part in output:
-#     print part
+shapefile = '\\\\gisdw\kclib\plibrary2\planning\shapes\polygon\uac.shp'
+shapefile = 'uac.shp'
+layer = 'uac'
+
+print 'ogrinfo -so ' + shapefile + ' ' + layer
+
+
+p = subprocess.Popen('ogrinfo -so ' + shapefile + ' ' + layer, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+# output is the result of the ogrinfo command. Test for the string 'NAD_1983_HARN_StatePlane_Washington_North_FIPS_4601_Feet'
+output = p.communicate()
+part = output[0]
+if 'PROJCS' in part:
+    if '"NAD_1983_HARN_StatePlane_Washington_North_FIPS_4601_Feet"' in part:
+        print 'Passed projection test'
+    # The following section should parse what the PROJCS is and state it
+    else:
+        print 'Projection for ' + shapefile + ' is not expected'
+else:
+    print 'Projection for ' + shapefile + ' is not defined'
+            
+     
+    
 ### Result ####
 # Had to open data source read-only.
 # INFO: Open of `sfw_baldeaglebuf.shp'
@@ -40,7 +60,6 @@
 ### End Result ###
 ########
 
-import subprocess
 
 def getInfo():
     return "Does Nothing"
