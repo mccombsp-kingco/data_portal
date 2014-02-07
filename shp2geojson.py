@@ -11,10 +11,34 @@ def fixDirname(dirName):
 	if dirName[-1] <> os.sep:
 	    dirName = dirName + os.sep
 	return dirName
+
+def shp2geojson(oldShapePath, jsonPath):
+    """Converts input shape file to a geoJSON file which is reprojected to web mercator.
+    Returns a list containing text objects with information discovered durring the conversion"""
     
-def shp2geojson(sourceDir, outputDir, github=0):
-    """This is the main function of the script. It gets a list of shape files 
-    converts them to geoJSON and optionally posts them to github"""
+    returnList = []
+    
+    ####
+    # Reproject Needed?
+    ####
+    # INSERT a test for expected projection print a warning if not expected state plane.
+    # look for results of eg. ogrinfo -so intrmpaa.shp intrmpaa
+    # returnList.append(getOGRinfo.getInfo())
+    ####
+
+    # reprojectString = "ogr2ogr -t_srs EPSG:4326 %s %s"% (newShapePath, oldShapePath)
+    # returnList.append(reprojectString)
+    # os.system(reprojectString)
+ 
+    ####
+    # This convert string specifies format and projection all together.
+    convertString = "ogr2ogr -f geoJSON -t_srs EPSG:4326 %s %s"% (jsonPath, oldShapePath)
+    returnList.append(convertString)
+    os.system(convertString)
+  
+def wholeDirLoop (sourceDir, outputDir, github=0):
+    """This looks into a directory and creates a list of shape files, which is then looped through to 
+    convert each shape file to a  geoJSON reprojected to web mercator, and optionally posts them to github"""
     # make a list of shape files
     sourceDir = fixDirname(sourceDir)
     outputDir = fixDirname(outputDir)
@@ -25,32 +49,21 @@ def shp2geojson(sourceDir, outputDir, github=0):
     # run the through the list of shape files
     for shapeFile in sourceList:
 
-        # reproject
-        
-        #########
-        # INSERT a test for expected projection print a warning if not expected state plane.
-        # look for results of eg. ogrinfo -so intrmpaa.shp intrmpaa
-        print getOGRinfo.getInfo()
-        #########
-
-        newName = "%sproj_%s"% (outputDir,shapeFile)
-        print "sourceDir: ", sourceDir
-        print "shapeFile: ", shapeFile
-        oldName = "%s%s"% (sourceDir, shapeFile)
-        print "oldName: ", oldName
-        reprojectString = "ogr2ogr -t_srs EPSG:4326 %s %s"% (newName, oldName)
-        print reprojectString
-        os.system(reprojectString) 
-
-        # convert to geoJSON
-        fileNameList = shapeFile.split('.')
+        ####
+        # Process the directory names and the shape file name to pass to the conversion function (shp2geojson)
+        #newShapePath = "%sproj_%s"% (outputDir, shapeFile) # New shape file full path
+        oldShapePath = "%s%s"% (sourceDir, shapeFile)      # Old shape file full path
+        fileNameList = shapeFile.split('.') # This is problematic if there are multiple '.'s in the shape file name
         jsonFileName = fileNameList[0]+".geojson"
-        fulljsonFilePath = outputDir+jsonFileName
-        print "output geoJSON path: " , fulljsonFilePath
-        convertString = "ogr2ogr -f geoJSON %s %s"% (fulljsonFilePath, newName)
-        os.system(convertString)
+        jsonPath = outputDir+jsonFileName     # New geoJSON file full path
+
+        statusList = shp2geojson(oldShapePath, jsonPath)
+        print statusList
+        
+        ####
+        # Test for need to push to github and call push_to_github if needed.
         if github:
-            push_to_github(fulljsonFilePath, jsonFileName)
+            push_to_github(jsonPath, jsonFileName)
         
 def push_to_github(fulljsonFilePath, jsonFileName):
     """Used to post geoJSON files up to github. This requires a functional git hub environment on your computer."""
@@ -58,19 +71,22 @@ def push_to_github(fulljsonFilePath, jsonFileName):
     # INSERT test for 100MB limit being exceeded.
     # CHANGE using code sample in commments below to make this run from a directory other than a functional git hub repository. Will require adding
     # a git repository directory as an agrument.
-    # Note: changed from copy to cp and del to rm so it would run on OSX.
     # TEST in git bash to see if rm and cp are functional.
     # CONSIDER: testing for os environment and using commands as appropriate.
 
-    # This will choke horribly if geoJSON is over 100MB and you're trying to load to a free github account. Don't know if that changes with paid
-    # account. Testing to prevent that outcome.
+    # This will choke horribly if geoJSON is over 100MB and you're trying to load to a free github account. Will not draw a map with a specific 27MB
+    # file that was tested. Setting the limit to 10MB at present. -pm Don't know if that changes with paid account. Testing to prevent that outcome.
     jsonInfo = os.stat(fulljsonFilePath)
-    if jsonInfo.st_size > 100000000:
-        print "%s is larger than 100MB and will not be loaded to github due to size restrictions."% fulljsonFilePath
+    if jsonInfo.st_size > 10000000:
+        print "%s is larger than 10MB and will not be loaded to github due to size restrictions."% fulljsonFilePath
     
     # git push happens here
     else:
-        os.system("cp %s .\\"% fulljsonFilePath)
+        if os.name == 'nt':
+            os.system("copy %s .\\"% fulljsonFilePath)
+        else: # this hasn't been tested. Should add a test for each other system that we use and a final else that says "too bad."
+            os.system("cp %s .\\"% fulljsonFilePath)
+            
         subprocess.call(['git', 'add', jsonFileName])
         subprocess.call(['git', 'commit', '-m', '"Data Upload: ' + time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime()) + '"'])
         subprocess.call(['git', 'push'])
@@ -99,12 +115,12 @@ if __name__ == '__main__':
             print "Looking for shape files in %s"% sys.argv[1]
             if len (sys.argv) == 3:
                     print "Will not attempt to post geoJSON files to github"
-                    shp2geojson(sys.argv[1], sys.argv[2])
+                    wholeDirLoop(sys.argv[1], sys.argv[2])
             if len(sys.argv) > 3:
                 print "Will put geoJSON files in %s"% sys.argv[2]
                 if sys.argv[3].lower() == "github":
                     print "Will attempt to post geoJSON files to github"
-                    shp2geojson(sys.argv[1], sys.argv[2], "github")
+                    wholeDirLoop(sys.argv[1], sys.argv[2], "github")
 
         else: print __doc__
 
