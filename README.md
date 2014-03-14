@@ -1,3 +1,5 @@
+test 001
+
 data_portal
 ===========
 
@@ -17,5 +19,4 @@ Download the stable zip archive. Copy gdaldata, gdaplugins, and tools/gdal-ogr f
 to c:\Program Files\gdal directory. Add C:\Program Files\gdal\gdal-ogr to the PATH system variable. Create new 
 system variables as follows: GDAL_DATA=\ms4w\gdaldata & GDAL_DRIVER_PATH=\ms4w\gdalplugins. From zip archive 
 ms4w/Apache/cgi-bin/ copy *.dll to c:\program files\gdal\gdal-ogr. 
-
 
